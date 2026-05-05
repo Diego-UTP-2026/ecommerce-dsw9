@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send(`
-    Hello World - [REEMPLAZAR POR SU NOMBRE]
+    Hello World - DIEGO LUIS CORDOBA LOZANO
     La aplicacion funciona en Render.
     Puerto: ${port} | Entorno: ${process.env.NODE_ENV || 'development'}
   `);
