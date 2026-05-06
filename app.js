@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send(`
-    Hello World - DIEGO LUIS CORDOBA LOZANO
+    Hello World - DIEGO LUIS CÓRDOBA
     La aplicacion funciona en Render.
     Puerto: ${port} | Entorno: ${process.env.NODE_ENV || 'development'}
   `);
@@ -67,26 +67,6 @@ sequelize.sync()
     process.exit(1);
   });
 
-  app.listen(port, () => {
-  console.log(`Servidor corriendo en puerto ${port}`);
-});
-
-//---------------------------------------------------------------
-
-// app.js — version Hello World
-/*require('dotenv').config();
-const express = require('express');
-const app     = express();
-const port    = process.env.PORT || 3000;
-
-app.get('/', (req, res) => {
-  res.send(`
-    <h1>Hello World - DIEGO LUIS CORDOBA LOZANO</h1>
-    <p>La aplicacion funciona en Render.</p>
-    <p>Puerto: ${port} | Entorno: ${process.env.NODE_ENV || 'development'}</p>
-  `);
-});
-
-app.listen(port, () => {
+  /*app.listen(port, () => {
   console.log(`Servidor corriendo en puerto ${port}`);
 });*/
