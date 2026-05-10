@@ -12,5 +12,3 @@ const Product = sequelize.define('Product', {
 });
 
 module.exports = Product;
-
-// Forzando redeploy 2.
