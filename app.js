@@ -21,6 +21,7 @@ const port = process.env.PORT || 3000;
 
 // Import:
 const userAuthRoutes = require('./routes/userAuth');
+const userRoutes = require('./routes/userAuth');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -65,6 +66,16 @@ app.use((req, res, next) => {
     Puerto: ${port} | Entorno: ${process.env.NODE_ENV || 'development'}
   `);*/
 //});
+
+// 3. Crear la ruta temporal para el Dashboard si el laboratorio te lo pide antes de tiempo:
+app.get('/customer/dashboard', (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/auth/user/login');
+    }
+    // Renderiza la vista del dashboard del cliente pasándole la sesión
+    res.render('customer/dashboard', { title: 'Mi Panel' }); 
+});
+
 app.use('/',         productRoutes);
 app.use('/cart',     cartRoutes);
 app.use('/checkout', checkoutRoutes);
@@ -72,6 +83,7 @@ app.use('/checkout', checkoutRoutes);
 app.use('/store', storeAuthRoutes);
 // Ruta (junto a las demás):
 app.use('/user', userAuthRoutes);
+app.use('/auth/user', userRoutes);
 
 
 app.use((req, res) => {
