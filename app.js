@@ -21,7 +21,7 @@ const port = process.env.PORT || 3000;
 
 // Import:
 const userAuthRoutes = require('./routes/userAuth');
-const userRoutes = require('./routes/userAuth');
+//const userRoutes = require('./routes/userAuth');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -67,27 +67,54 @@ app.use((req, res, next) => {
   `);*/
 //});
 
-// 3. Crear la ruta temporal para el Dashboard si el laboratorio te lo pide antes de tiempo:
-app.get('/customer/dashboard', (req, res) => {
+// Crear la ruta temporal para el Dashboard si el laboratorio te lo pide antes de tiempo:
+/*app.get('/customer/dashboard', (req, res) => {
     if (!req.session.userId) {
         return res.redirect('/auth/user/login');
     }
     // Renderiza la vista del dashboard del cliente pasándole la sesión
     res.render('customer/dashboard', { title: 'Mi Panel' }); 
+});*/
+
+
+// Dashboard del Cliente protegido
+app.get('/customer/dashboard', (req, res) => {
+    // Si usaste req.session.userId en tu controlador:
+    if (!req.session.userId) {
+        return res.redirect('/user/login'); // Redirige a tu ruta real de login
+    }
+    
+    // Forzamos el layout falso si el dashboard maneja su propia plantilla completa (como el panel admin)
+    res.render('customer/dashboard', { 
+        title: 'Mi Panel', 
+        layout: false // Cambiar a true si usa la barra de navegación común de la tienda
+    }); 
 });
 
-app.use('/',         productRoutes);
+/*app.use('/',         productRoutes);
 app.use('/cart',     cartRoutes);
 app.use('/checkout', checkoutRoutes);
 // Rutas — junto a los app.use() existentes:
 app.use('/store', storeAuthRoutes);
 // Ruta (junto a las demás):
 app.use('/user', userAuthRoutes);
-app.use('/auth/user', userRoutes);
+//app.use('/auth/user', userRoutes);*/
+
+// --- RUTAS DEL SISTEMA ---
+app.use('/',         productRoutes);
+app.use('/cart',     cartRoutes);
+app.use('/checkout', checkoutRoutes);
+app.use('/store',    storeAuthRoutes);
+app.use('/user',     userAuthRoutes); // Mapea a /user/login, /user/register, etc.
 
 
-app.use((req, res) => {
+/*app.use((req, res) => {
   res.status(404).render('404', { title: 'Pagina no encontrada' });
+});*/
+
+// --- MANEJADOR 404 ---
+app.use((req, res) => {
+  res.status(404).render('404', { title: 'Pagina no encontrada', layout: false });
 });
 
 sequelize.sync()
