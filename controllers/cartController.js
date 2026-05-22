@@ -16,12 +16,19 @@ const cartController = {
       if (idx > -1) {
         cart.items[idx].quantity += quantity;
       } else {
-        cart.items.push({ product: { id: product.id, name: product.name, price: parseFloat(product.price), imageUrl: product.imageUrl }, quantity });
+        //cart.items.push({ product: { id: product.id, name: product.name, price: parseFloat(product.price), imageUrl: product.imageUrl }, quantity });
+        cart.items.push({ product: {
+          id:       product.id,
+          name:     product.name,
+          price:    parseFloat(product.price),
+          imageUrl: product.imageUrl || product.image_url,
+          store_id: product.store_id || null   // guardamos la tienda para usarla en OrderItem
+        }, quantity });
       }
       cart.totalQty   = cart.items.reduce((t,i) => t + i.quantity, 0);
       cart.totalPrice = parseFloat(cart.items.reduce((t,i) => t + i.product.price * i.quantity, 0).toFixed(2));
       req.session.cart = cart;
-      res.redirect('/cart');
+      res.redirect('/cartgit commit -m "feat: modelos Store, User, Wishlist — arquitectura marketplace"');
     } catch (err) {
       res.status(500).render('error', { title:'Error', message:'Error al agregar al carrito' });
     }

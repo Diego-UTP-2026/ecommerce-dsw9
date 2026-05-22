@@ -8,7 +8,14 @@ const Product = sequelize.define('Product', {
   description: { type: DataTypes.TEXT },
   price:       { type: DataTypes.DECIMAL(10, 2), allowNull: false },
   stock:       { type: DataTypes.INTEGER, defaultValue: 0 },
-  imageUrl:    { type: DataTypes.STRING }
+  imageUrl:    { type: DataTypes.STRING },
+
+  store_id:    {type: DataTypes.INTEGER,
+    allowNull: true,
+    references: { model: 'stores', key: 'id' }
+  }
+
+
 });
 
 module.exports = Product;

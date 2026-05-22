@@ -22,6 +22,7 @@ async function getPayPalAccessToken() {
   const data = await res.json();
   return data.access_token;
 }
+
 const checkoutController = {
   getCheckoutPage: (req, res) => {
     if (!req.session.cart || req.session.cart.items.length === 0)
@@ -40,12 +41,14 @@ const checkoutController = {
         email:     req.body.email,     address:   req.body.address,
         city:      req.body.city,      province:  req.body.province,
         zip:       req.body.zip || '', phone:     req.body.phone,
-        total:     cart.totalPrice,    status:    'pending'
+        total:     cart.totalPrice,    status:    'pending',
+        user_id:   req.session.userId || null   // null si el usuario no está autenticado
       });
       for (const item of cart.items) {
         await OrderItem.create({
           OrderId:   order.id,
           ProductId: item.product.id,
+          store_id:   item.product.store_id || null,
           quantity:  item.quantity,
           price:     item.product.price
         });
@@ -65,7 +68,8 @@ const checkoutController = {
   // 2. El JS de payment.ejs llama a este endpoint para crear la orden en PayPal
   createPayPalOrder: async (req, res) => {
     try {
-      const order       = await Order.findByPk(parseInt(req.body.orderId));
+      const orderIdBuscar = req.body.orderId || req.session.pendingOrderId;
+      const order = await Order.findByPk(parseInt(orderIdBuscar));
       if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
       const accessToken = await getPayPalAccessToken();
       const response    = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
@@ -89,7 +93,8 @@ const checkoutController = {
   // 3. El JS de payment.ejs llama aquí cuando el usuario aprueba en PayPal
   capturePayPalOrder: async (req, res) => {
     try {
-      const { paypalOrderId, orderId } = req.body;
+      const { paypalOrderId } = req.body;
+      const orderIdBuscar = req.body.orderId || req.session.pendingOrderId;
       const accessToken = await getPayPalAccessToken();
       const response    = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${paypalOrderId}/capture`, {
         method: 'POST',
@@ -98,7 +103,7 @@ const checkoutController = {
       const data     = await response.json();
       const captured = data.status === 'COMPLETED';
 
-      const order = await Order.findByPk(parseInt(orderId));
+      const order = await Order.findByPk(parseInt(orderIdBuscar));
       if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
 
       if (captured) {
@@ -115,9 +120,30 @@ const checkoutController = {
     }
   },
 
+  // 4. Muestra la página de éxito leyendo los datos reales de la BD
+  getSuccessPage: async (req, res) => {
+    try {
+      const orderId = req.query.orderId;
+      const order = await Order.findByPk(orderId);
+
+      if (!order) {
+        return res.redirect('/');
+      }
+
+      // Aseguramos que pasamos el objeto order completo para que la vista renderice order.id y order.total
+      res.render('order-success', { 
+        title: 'Pedido Completado', 
+        order: order 
+      });
+    } catch (error) {
+      res.redirect('/');
+    }
+  },
+
   handleCancelPayment: async (req, res) => {
     try {
-      const order = await Order.findByPk(parseInt(req.query.orderId));
+      const orderIdBuscar = req.query.orderId || req.session.pendingOrderId;
+      const order = await Order.findByPk(parseInt(orderIdBuscar));
       if (order) await order.update({ status: 'cancelled' });
       res.render('payment-failed', {
         title:   'Pago Cancelado',
