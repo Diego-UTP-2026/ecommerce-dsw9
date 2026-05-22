@@ -78,7 +78,7 @@ app.use((req, res, next) => {
 
 
 // Dashboard del Cliente protegido
-app.get('/customer/dashboard', (req, res) => {
+/*app.get('/customer/dashboard', (req, res) => {
     // Si usaste req.session.userId en tu controlador:
     if (!req.session.userId) {
         return res.redirect('/user/login'); // Redirige a tu ruta real de login
@@ -88,6 +88,21 @@ app.get('/customer/dashboard', (req, res) => {
     res.render('customer/dashboard', { 
         title: 'Mi Panel', 
         layout: false // Cambiar a true si usa la barra de navegación común de la tienda
+    }); 
+});*/
+
+// Reemplaza tu app.get('/customer/dashboard', ...) actual por este:
+app.get('/customer/dashboard', (req, res) => {
+    // 1. Verificación estricta de la sesión del usuario comprador
+    if (!req.session || !req.session.userId) {
+        return res.redirect('/user/login'); 
+    }
+
+    // 2. Renderizado preventivo pasando variables por si la vista las pide
+    res.render('customer/dashboard', { 
+        title: 'Panel de Cliente',
+        user: req.session.user || { name: 'Karina Pardo' }, // Evita errores si la vista lee user.name
+        layout: false // Fuerza a que no use el layout base si es un panel independiente
     }); 
 });
 
