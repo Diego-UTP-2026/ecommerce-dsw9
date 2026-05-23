@@ -1,7 +1,42 @@
 const { User, Order, OrderItem, Product, Store, Wishlist } = require('../models');
+//const { Order, Product, Wishlist } = require('../models');
 
 // GET /customer/dashboard
-const dashboard = async (req, res) => {
+exports.dashboard = async (req, res) => {
+    try {
+        // ID del usuario logueado en la sesión de Express
+        const currentUserId = req.session.userId; 
+
+        // 1. Consultar órdenes forzando la columna real de tu base de datos (user_id)
+        const orders = await Order.findAll({
+            where: { 
+                // Aquí cambiamos userId por 'user_id' para que coincida con tu BD en MySQL Workbench
+                user_id: currentUserId 
+            },
+            include: [{ model: Product, as: 'Products' }], // O como esté tu relación de pertenencia
+            order: [['createdAt', 'DESC']]
+        });
+
+        // 2. Consultar Wishlist del cliente
+        const wishlistItems = await Wishlist.findAll({
+            where: { user_id: currentUserId },
+            include: [{ model: Product }]
+        });
+
+        // 3. Renderizar la vista oficial del Paso 16
+        res.render('customer/dashboard', {
+            title: 'Panel de Comprador',
+            orders: orders,
+            wishlist: wishlistItems,
+            user: req.session.user
+        });
+
+    } catch (error) {
+        console.error("Error al cargar el Dashboard de Cliente:", error);
+        res.status(500).send("Error en el servidor: " + error.message);
+    }
+};
+/*const dashboard = async (req, res) => {
   try {
     const user = await User.findByPk(req.session.userId);
     const recentOrders = await Order.findAll({
@@ -22,7 +57,7 @@ const dashboard = async (req, res) => {
     console.error("Error en Dashboard:", error);
     res.status(500).send("Error en el servidor: " + error.message);
   }
-};
+};*/
 
 // GET /customer/orders
 const listOrders = async (req, res) => {
