@@ -95,7 +95,7 @@ app.use((req, res, next) => {
 });*/
 
 // Reemplaza tu app.get('/customer/dashboard', ...) actual por este:
-app.get('/customer/dashboard', (req, res) => {
+/*app.get('/customer/dashboard', (req, res) => {
     // 1. Verificación estricta de la sesión del usuario comprador
     if (!req.session || !req.session.userId) {
         return res.redirect('/user/login'); 
@@ -107,7 +107,7 @@ app.get('/customer/dashboard', (req, res) => {
         user: req.session.user || { name: 'Karina Pardo' }, // Evita errores si la vista lee user.name
         layout: false // Fuerza a que no use el layout base si es un panel independiente
     }); 
-});
+});*/
 
 /*app.use('/',         productRoutes);
 app.use('/cart',     cartRoutes);
@@ -126,7 +126,6 @@ app.use('/store',    storeAuthRoutes);
 app.use('/user',     userAuthRoutes); // Mapea a /user/login, /user/register, etc.
 app.use('/store-admin', storeAdminRoutes);
 app.use('/customer', customerRoutes);
-
 
 /*app.use((req, res) => {
   res.status(404).render('404', { title: 'Pagina no encontrada' });
