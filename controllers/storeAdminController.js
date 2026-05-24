@@ -4,6 +4,52 @@ const { Op } = require('sequelize');
 
 // GET /store-admin/dashboard
 const dashboard = async (req, res) => {
+  try {
+    const storeId = req.session.storeId;
+
+    // 1. Validar que exista una sesión de tienda activa
+    if (!storeId) {
+      return res.redirect('/store/login');
+    }
+
+    // 2. Buscar datos de la tienda de forma asíncrona
+    const store = await Store.findByPk(storeId);
+    if (!store) {
+      return res.redirect('/store/login');
+    }
+
+    // 3. Calcular rango del mes actual
+    const now        = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // 4. Traer los items vendidos en el mes
+    const items = await OrderItem.findAll({
+      where: { store_id: storeId, createdAt: { [Op.gte]: monthStart } },
+      include: [{ model: Order, as: 'order' }]
+    });
+
+    // 5. Procesar estadísticas de forma segura
+    const monthSales   = items.reduce((s, i) => s + parseFloat(i.price || 0) * i.quantity, 0);
+    const orderCount   = new Set(items.map(i => i.order_id)).size;
+
+    // 🌟 CORRECCIÓN CRÍTICA: Añadir el 'await' obligatorio aquí
+    const productCount = await Product.count({ where: { store_id: storeId } });
+
+    // 6. Renderizar panel administrativo limpiamente
+    res.render('store-admin/dashboard', { 
+      layout: false,
+      store, 
+      monthSales: monthSales.toFixed(2), 
+      orderCount, 
+      productCount 
+    });
+
+  } catch (error) {
+    console.error("Error crítico en el Dashboard de Tienda:", error);
+    res.status(500).send("Error interno en el panel de administración: " + error.message);
+  }
+};
+/*const dashboard = async (req, res) => {
   const storeId = req.session.storeId;
   const store   = await Store.findByPk(storeId);
 
@@ -21,7 +67,7 @@ const dashboard = async (req, res) => {
   res.render('store-admin/dashboard', { layout: false,
     store, monthSales: monthSales.toFixed(2), orderCount, productCount
   });
-};
+};*/
 
 // GET /store-admin/products
 const listProducts = async (req, res) => {
