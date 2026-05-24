@@ -75,7 +75,7 @@ const deleteProduct = async (req, res) => {
 };
 
 // controllers/storeAdminController.js  (3/3) — Ventas y settings
-const { sequelize } = require('../config/database');
+//const { sequelize } = require('../config/database');
 
 // GET /store-admin/orders
 const listOrders = async (req, res) => {
@@ -107,6 +107,59 @@ const showSettings = async (req, res) => {
 
 // POST /store-admin/settings (actualizar paypal_email y datos de tienda)
 const updateSettings = async (req, res) => {
+  try {
+    const { name, description, paypal_email } = req.body;
+    const storeId = req.session.storeId;
+
+    // 1. Actualizar en la base de datos de Aiven usando snake_case
+    await Store.update(
+      { name, description, paypal_email },
+      { where: { id: storeId } }
+    );
+
+    // 2. Recuperar el registro actualizado desde la base de datos
+    const updatedStore = await Store.findByPk(storeId);
+
+    // 3. 🌟 PASO CLAVE: Sincronizar la sesión de Express con los nuevos datos
+    req.session.store = updatedStore;
+
+    // 4. Guardar explícitamente en la sesión y renderizar la vista con la variable 'page' para el menú
+    req.session.save((err) => {
+      if (err) {
+        console.error("Error al guardar la sesión:", err);
+        return res.render('store-admin/settings', { 
+          layout: false, 
+          store: updatedStore, 
+          page: 'settings', 
+          success: null, 
+          error: 'Error al actualizar la sesión.' 
+        });
+      }
+
+      res.render('store-admin/settings', { 
+        layout: false, 
+        store: updatedStore, 
+        page: 'settings', // Le pasamos la página actual para que el sidebar se pinte 'active'
+        success: 'Configuración actualizada con éxito.', 
+        error: null 
+      });
+    });
+
+  } catch (error) {
+    console.error("Error en updateSettings:", error);
+    // Recuperar los datos actuales para no romper la vista en caso de error de base de datos
+    const currentStore = await Store.findByPk(req.session.storeId);
+    res.render('store-admin/settings', { 
+      layout: false, 
+      store: currentStore, 
+      page: 'settings', 
+      success: null, 
+      error: 'Ocurrió un error en el servidor: ' + error.message 
+    });
+  }
+};
+
+/*const updateSettings = async (req, res) => {
   const { name, description, paypal_email } = req.body;
   await Store.update(
     { name, description, paypal_email },
@@ -114,7 +167,7 @@ const updateSettings = async (req, res) => {
   );
   const store = await Store.findByPk(req.session.storeId);
   res.render('store-admin/settings', { layout: false, store, success: 'Configuracion actualizada.', error: null });
-};
+};*/
 
 module.exports = {
   dashboard, listProducts, showNewProduct, createProduct,
