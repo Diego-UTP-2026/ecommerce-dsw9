@@ -10,7 +10,8 @@ const Product = sequelize.define('Product', {
   stock:       { type: DataTypes.INTEGER, defaultValue: 0 },
   imageUrl:    { type: DataTypes.STRING },
 
-  store_id:    {type: DataTypes.INTEGER,
+  store_id:    {
+    type: DataTypes.INTEGER,
     allowNull: true,
     references: { model: 'stores', key: 'id' }
   }

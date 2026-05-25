@@ -22,20 +22,16 @@ const Order = sequelize.define('Order', {
     allowNull: true,
     references: { model: 'users', key: 'id' }
   }
-}, {
+  /*}, {
   // ── ¡AGREGA ESTA SECCIÓN DE CONFIGURACIÓN AQUÍ! ──
-  underscored: true, // Fuerza a Sequelize a usar snake_case para claves foráneas automáticas
-  tableName: 'Orders', // Asegura que mapee exactamente a tu tabla de Aiven
+  //underscored: true, // Fuerza a Sequelize a usar snake_case para claves foráneas automáticas
+  //tableName: 'Orders', // Asegura que mapee exactamente a tu tabla de Aiven
 
-// ── FORZAR NOMBRE DE COLUMNAS DE TIEMPO REALES ──────────────────
+  // ── FORZAR NOMBRE DE COLUMNAS DE TIEMPO REALES ──────────────────
   // Esto evita que busque 'created_at' y use las de tu base de datos
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  //createdAt: 'createdAt',
+  //updatedAt: 'updatedAt'*/
 });
-
-module.exports = Order;
-
-
 
 /*const { DataTypes } = require('sequelize');
 const sequelize     = require('../config/database');
@@ -96,3 +92,5 @@ const Order = sequelize.define('Order', {
 });
 
 module.exports = Order;*/
+
+module.exports = Order;

@@ -46,13 +46,22 @@ const checkoutController = {
       });
       for (const item of cart.items) {
         await OrderItem.create({
+        order_id:   order.id,                // 🌟 Corregido a snake_case
+        product_id: item.product.id,         // 🌟 Corregido a snake_case
+        store_id:   item.product.store_id || null, 
+        quantity:   item.quantity,
+        price:      item.product.price
+      });
+    }
+      /*for (const item of cart.items) {
+        await OrderItem.create({
           OrderId:   order.id,
           ProductId: item.product.id,
           store_id:   item.product.store_id || null,
           quantity:  item.quantity,
           price:     item.product.price
         });
-      }
+      }*/
       req.session.pendingOrderId = order.id;
       // Renderiza la vista con los botones de PayPal
       res.render('payment', {
