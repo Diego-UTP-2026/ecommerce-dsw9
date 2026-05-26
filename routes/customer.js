@@ -2,6 +2,16 @@ const express = require('express');
 const router  = express.Router();
 const ctrl    = require('../controllers/customerController');
 
+
+// Middleware de protección interna
+const requireCustomerAuth = (req, res, next) => {
+  if (!req.session || !req.session.userId) {
+    // 🌟 ASEGÚRATE DE QUE ESTÉ ASÍ (Ruta relativa limpia):
+    return res.redirect('/user/login'); 
+  }
+  next();
+};
+
 // 1. Importamos el módulo de autenticación completo para evitar desajustes de nombres
 const authMiddleware = require('../middleware/authMiddleware');
 
