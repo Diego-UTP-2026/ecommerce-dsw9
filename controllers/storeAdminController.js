@@ -22,11 +22,20 @@ const dashboard = async (req, res) => {
     const now        = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // 4. Traer los items vendidos en el mes
+    const items = await OrderItem.findAll({
+      where: { store_id: storeId, createdAt: { [Op.gte]: monthStart } },
+      include: [{ 
+        model: Order, 
+        as: 'order',
+        attributes: ['id', 'total', 'status'] // 🌟 Trae solo campos específicos sin jalar timestamps conflictivos
+      }]
+    });
+
+    /*// 4. Traer los items vendidos en el mes
     const items = await OrderItem.findAll({
       where: { store_id: storeId, createdAt: { [Op.gte]: monthStart } },
       include: [{ model: Order, as: 'order' }]
-    });
+    });*/
 
     // 5. Procesar estadísticas de forma segura
     const monthSales   = items.reduce((s, i) => s + parseFloat(i.price || 0) * i.quantity, 0);
