@@ -125,6 +125,7 @@ const removeFromWishlist = async (req, res) => {
       }
     });
     res.redirect('/customer/wishlist');
+    
   } catch (error) {
     console.error("Error en removeFromWishlist:", error);
     res.status(500).send(error.message);
