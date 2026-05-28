@@ -1,5 +1,6 @@
 // controllers/customerController.js
 const { User, Order, OrderItem, Product, Store, Wishlist } = require('../models');
+const sequelize = require('../config/database');
 
 // GET /customer/dashboard
 const dashboard = async (req, res) => {
@@ -15,7 +16,8 @@ const dashboard = async (req, res) => {
         as: 'items',
         include: [{ model: Product, as: 'product' }] 
       }],
-      order: [['createdAt', 'DESC']],
+      //order: [['createdAt', 'DESC']], // Corregir 
+      order: [sequelize.literal('`createdAt` DESC')],
       limit: 3
     });
 
@@ -47,7 +49,8 @@ const listOrders = async (req, res) => {
         as: 'items',
         include: [{ model: Product, as: 'product' }] 
       }],
-      order: [['createdAt', 'DESC']]
+      //order: [['createdAt', 'DESC']]
+      order: [sequelize.literal('`createdAt` DESC')]
     });
     res.render('customer/orders', { layout: false, user, orders });
   } catch (error) {
