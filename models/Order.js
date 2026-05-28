@@ -28,8 +28,18 @@ const Order = sequelize.define('Order', {
   // ── MAPEO EXPLÍCITO DE TIMESTAMPS ──────────────────────────────────────
   // Esto soluciona de raíz el error en /customer/dashboard y /store-admin.
   // Le dice a Sequelize: "En JS usa 'createdAt', pero en MySQL busca 'createdAt'"
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  //createdAt: 'createdAt',
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: true,      // Esto evita que MySQL tire el error de '0000-00-00' al alterar la tabla
+    field: 'createdAt'
+  },
+  //updatedAt: 'updatedAt'
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'updatedAt'
+  }
 });
 
 module.exports = Order;
