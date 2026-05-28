@@ -1,4 +1,3 @@
-// models/Order.js
 const { DataTypes } = require('sequelize');
 const sequelize     = require('../config/database');
 
@@ -15,31 +14,25 @@ const Order = sequelize.define('Order', {
   total:     { type: DataTypes.DECIMAL(10, 2), allowNull: false },
   paymentId: { type: DataTypes.STRING },
   status:    { type: DataTypes.STRING,         defaultValue: 'pending' },
-
-  user_id: {
+  user_id:   {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: { model: 'users', key: 'id' }
-  }
-}, {
-  tableName: 'Orders', // Mapea exactamente a tu tabla física en Aiven (image_e969e4.jpg)
-  timestamps: true,    // Activa el control de tiempos automáticos de Sequelize
+  },
 
-  // ── MAPEO EXPLÍCITO DE TIMESTAMPS ──────────────────────────────────────
-  // Esto soluciona de raíz el error en /customer/dashboard y /store-admin.
-  // Le dice a Sequelize: "En JS usa 'createdAt', pero en MySQL busca 'createdAt'"
-  //createdAt: 'createdAt',
+  // 🌟 PONERLOS AQUÍ ADENTRO SOLUCIONA TODO:
+  // Definimos los campos físicos reales como atributos normales permitiendo valores nulos
   createdAt: {
     type: DataTypes.DATE,
-    allowNull: true,      // Esto evita que MySQL tire el error de '0000-00-00' al alterar la tabla
-    field: 'createdAt'
+    allowNull: true
   },
-  //updatedAt: 'updatedAt'
   updatedAt: {
     type: DataTypes.DATE,
-    allowNull: true,
-    field: 'updatedAt'
+    allowNull: true
   }
+}, {
+  tableName: 'Orders', 
+  timestamps: true // Dejamos que Sequelize maneje el tiempo usando los campos nulos que declaramos arriba
 });
 
 module.exports = Order;
