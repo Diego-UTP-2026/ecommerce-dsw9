@@ -21,9 +21,11 @@ const dashboard = async (req, res) => {
     // 3. Calcular rango del mes actual
     const now        = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    const items = await OrderItem.findAll({
+    
+    // 4. Traer los items vendidos en el mes
+   const items = await OrderItem.findAll({
       where: { store_id: storeId, createdAt: { [Op.gte]: monthStart } },
+      //include: [{ model: Order, as: 'order' }]
       include: [{ 
         model: Order, 
         as: 'order',
