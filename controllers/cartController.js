@@ -28,7 +28,7 @@ const cartController = {
       cart.totalQty   = cart.items.reduce((t,i) => t + i.quantity, 0);
       cart.totalPrice = parseFloat(cart.items.reduce((t,i) => t + i.product.price * i.quantity, 0).toFixed(2));
       req.session.cart = cart;
-      res.redirect('/cartgit commit -m "feat: modelos Store, User, Wishlist — arquitectura marketplace"');
+      res.redirect('/cart');
     } catch (err) {
       res.status(500).render('error', { title:'Error', message:'Error al agregar al carrito' });
     }
